@@ -3,6 +3,8 @@ package org.ayala.wheel
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -29,19 +31,20 @@ data class SolutionOption(
 )
 
 val solutionOptions = listOf(
-    SolutionOption("😊", "Take deep breaths", Color(0xFFFFC107)),
-    SolutionOption("🗣️", "Talk to a grown-up", Color(0xFF4CAF50)),
-    SolutionOption("🎨", "Draw your feelings", Color(0xFF2196F3)),
-    SolutionOption("🎵", "Listen to music", Color(0xFF9C27B0)),
-    SolutionOption("🧸", "Hug a stuffed animal", Color(0xFFE91E63)),
-    SolutionOption("💪", "Count to 10", Color(0xFF795548)),
-    SolutionOption("🚶", "Take a walk", Color(0xFF607D8B)),
-    SolutionOption("📚", "Read a book", Color(0xFFFF5722))
+    SolutionOption("👃🏼", "לינשום עמוק", Color(0xFFFFC107)),
+    SolutionOption("🗣️", "לדבר עם מישהו", Color(0xFF4CAF50)),
+    SolutionOption("🎨", "לצייר את הרגשות", Color(0xFF2196F3)),
+    SolutionOption("🎵", "לשמוע מוזיקה", Color(0xFF9C27B0)),
+    SolutionOption("🧸", "לחבק בובה", Color(0xFFE91E63)),
+    SolutionOption("👐🏼", "לספור עד 10", Color(0xFF795548)),
+    SolutionOption("🚶", "לעשות הליכה", Color(0xFF607D8B)),
+    SolutionOption("📚", "לקרוא ספר", Color(0xFFFF5722))
 )
 
 @Composable
 fun App() {
     val textMeasurer = rememberTextMeasurer()
+    var textInput by remember { mutableStateOf("") }
     
     MaterialTheme {
         Column(
@@ -52,13 +55,39 @@ fun App() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                "Solution Wheel",
+                "גלגל הפתרונות",
                 style = TextStyle(
                     fontSize = 24.sp,
                     textAlign = TextAlign.Center
                 ),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
+            
+            TextField(
+                value = textInput,
+                onValueChange = { textInput = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
+                placeholder = {
+                    Text(
+                        "תוכל לספר מה קרה? למה אתה מרגיש צורך בפתרון?",
+                        style = TextStyle(fontSize = 16.sp)
+                    )
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White,
+                    focusedIndicatorColor = Color.Black,
+                    unfocusedIndicatorColor = Color.Gray
+                ),
+                keyboardOptions = KeyboardOptions.Default,
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Right
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
             
             // Pointer arrow
             Canvas(modifier = Modifier.size(30.dp, 40.dp)) {
@@ -164,7 +193,7 @@ fun App() {
                 enabled = !isSpinning,
                 modifier = Modifier.padding(16.dp)
             ) {
-                Text(if (isSpinning) "Spinning..." else "Spin the Wheel!")
+                Text(if (isSpinning) "מסתובב..." else "סובב את הגלגל!")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
