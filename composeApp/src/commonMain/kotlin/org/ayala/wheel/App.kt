@@ -67,8 +67,7 @@ fun App() {
                 value = textInput,
                 onValueChange = { textInput = it },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
+                    .fillMaxWidth(),
                 placeholder = {
                     Text(
                         "תוכל לספר מה קרה? למה אתה מרגיש צורך בפתרון?",
@@ -77,8 +76,8 @@ fun App() {
                 },
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.White,
-                    focusedIndicatorColor = Color.Black,
-                    unfocusedIndicatorColor = Color.Gray
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
                 ),
                 keyboardOptions = KeyboardOptions.Default,
                 textStyle = TextStyle(
