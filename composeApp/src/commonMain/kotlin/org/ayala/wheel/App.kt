@@ -8,6 +8,8 @@ import androidx.compose.material.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +25,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.PI
 import kotlin.random.Random
+
+interface SpeechRecognizer {
+    fun startListening(
+        onResult: (String) -> Unit,
+        onError: (String) -> Unit
+    )
+    fun stopListening()
+    fun isAvailable(): Boolean
+    
+    @Composable
+    fun Initialize()
+
+    companion object {
+        fun create(): SpeechRecognizer = createSpeechRecognizer()
+    }
+}
+
+expect fun createSpeechRecognizer(): SpeechRecognizer
+
+@Composable
+fun rememberSpeechRecognizer(): SpeechRecognizer {
+    val speechRecognizer = remember { SpeechRecognizer.create() }
+    speechRecognizer.Initialize()
+    return speechRecognizer
+}
 
 data class SolutionOption(
     val emoji: String,
@@ -45,6 +72,8 @@ val solutionOptions = listOf(
 fun App() {
     val textMeasurer = rememberTextMeasurer()
     var textInput by remember { mutableStateOf("") }
+    var isListening by remember { mutableStateOf(false) }
+    val speechRecognizer = rememberSpeechRecognizer()
     
     MaterialTheme {
         Column(
@@ -62,29 +91,67 @@ fun App() {
                 ),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            
-            TextField(
-                value = textInput,
-                onValueChange = { textInput = it },
-                modifier = Modifier
-                    .fillMaxWidth(),
-                placeholder = {
-                    Text(
-                        "תוכל לספר מה קרה? למה אתה מרגיש צורך בפתרון?",
-                        style = TextStyle(fontSize = 16.sp)
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                // Text field
+                TextField(
+                    value = textInput,
+                    onValueChange = { textInput = it },
+                    modifier = Modifier
+                        .weight(1f),
+                    placeholder = {
+                        Text(
+                            "תוכל לספר מה קרה? למה אתה מרגיש צורך בפתרון?",
+                            style = TextStyle(fontSize = 16.sp)
+                        )
+                    },
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.White,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                    ),
+                    keyboardOptions = KeyboardOptions.Default,
+                    textStyle = TextStyle(
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Right
                     )
-                },
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                ),
-                keyboardOptions = KeyboardOptions.Default,
-                textStyle = TextStyle(
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Right
                 )
-            )
+
+                // Microphone button
+                if (speechRecognizer.isAvailable()) {
+                    IconButton(
+                        onClick = {
+                            if (!isListening) {
+                                isListening = true
+                                speechRecognizer.startListening(
+                                    onResult = { result ->
+                                        textInput = result
+                                    },
+                                    onError = { error ->
+                                        isListening = false
+                                    }
+                                )
+                            } else {
+                                isListening = false
+                                speechRecognizer.stopListening()
+                            }
+                        },
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Person,
+                            contentDescription = "הקלטה",
+                            tint = if (isListening) Color.Red else Color.Black
+                        )
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
             
